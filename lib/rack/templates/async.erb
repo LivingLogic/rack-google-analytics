@@ -1,6 +1,7 @@
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
+  console.log(_gaq)
   _gaq.push(['_setAccount', <%= @options[:tracker].inspect %>]);
 <% if @options[:multiple] %>
   _gaq.push(['_setDomainName', <%= @options[:domain].inspect %>]);
@@ -24,7 +25,22 @@
   end
    %>
   _gaq.push(['_trackPageview']);
+  
+  // Set to the same value as the web property used on the site
+  var gaProperty =  <%= @options[:tracker].inspect %>;
 
+  // Disable tracking if the opt-out cookie exists.
+  var disableStr = 'ga-disable-' + gaProperty;
+  if (document.cookie.indexOf(disableStr + '=true') > -1) {
+    window[disableStr] = true;
+  }
+
+  // Opt-out function
+  function gaOptout() {
+    document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+    window[disableStr] = true;
+  }
+  
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
 <% if @options[:advertising] %>
